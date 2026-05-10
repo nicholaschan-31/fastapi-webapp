@@ -60,6 +60,7 @@ jobs:
       - name: Run tests
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/gametracker_test
+          PYTHONPATH: ${{ github.workspace }}
           SECRET_KEY: test-secret-key-for-ci
         run: |
           mkdir -p pytest-results
