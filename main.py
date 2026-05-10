@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+import os
 from typing import Annotated, Literal
 
 from fastapi import FastAPI, HTTPException, Depends, status
@@ -17,7 +18,7 @@ from sqlalchemy.orm import Session
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-SECRET_KEY = "change-this-secret-key-before-production"
+SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-key-before-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -192,6 +193,11 @@ async def read_current_user(current_user: current_user_dependency):
 @app.get("/")
 async def home():
     return FileResponse("static/index.html")
+
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
 
 
 @app.get("/login/")
