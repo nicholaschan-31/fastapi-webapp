@@ -1,4 +1,4 @@
-name: CI/CD — Build and deploy to ECS
+name: CI/CD - Build and deploy to ECS
 
 on:
   push:
@@ -13,12 +13,9 @@ on:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-  ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
-  ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
-  CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
 
 jobs:
-  # ── Job 1: Run tests ───────────────────────────────────────
+  # Job 1: Run tests
   test:
     name: Run tests
     runs-on: ubuntu-latest
@@ -33,15 +30,10 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres -d gametracker_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
 
     steps:
       - name: Checkout code
@@ -62,25 +54,26 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest pytest-asyncio httpx
 
       - name: Run tests
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/gametracker_test
-          REDIS_URL: redis://localhost:6379
           SECRET_KEY: test-secret-key-for-ci
-        run: pytest app/tests/ -v --tb=short
+        run: |
+          mkdir -p pytest-results
+          pytest tests/ -v --tb=short --junitxml=pytest-results/results.xml
 
       - name: Upload test results
-        if: always() # uploads even if tests fail so you can inspect
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: pytest-results/
+          if-no-files-found: ignore
 
-  # ── Job 2: Build, push, deploy ─────────────────────────────
+  # Job 2: Build, push, deploy
   deploy:
     name: Build and deploy
     runs-on: ubuntu-latest
