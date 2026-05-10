@@ -100,12 +100,27 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          IMAGE=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          set -euo pipefail
 
-          docker build -t $IMAGE .
-          docker tag $IMAGE $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          docker push $IMAGE
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+          if [ -z "$ECR_REGISTRY" ]; then
+            echo "ECR_REGISTRY is empty"
+            exit 1
+          fi
+
+          if [ -z "$ECR_REPOSITORY" ]; then
+            echo "ECR_REPOSITORY is empty. Check the ECR_REPOSITORY GitHub secret."
+            exit 1
+          fi
+
+          IMAGE="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          LATEST_IMAGE="${ECR_REGISTRY}/${ECR_REPOSITORY}:latest"
+
+          docker build --file "${GITHUB_WORKSPACE}/Dockerfile" --tag "$IMAGE" "$GITHUB_WORKSPACE"
+          docker tag "$IMAGE" "$LATEST_IMAGE"
+          docker push "$IMAGE"
+          docker push "$LATEST_IMAGE"
+
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
