@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Game Library Tracker</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="scanline"></div>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">PLAYER ARCHIVE</p>
+        <h1>Game Library Tracker</h1>
+      </div>
+      <div class="player-card" id="playerCard">
+        <span class="pixel-avatar" aria-hidden="true"></span>
+        <div>
+          <span class="label">SIGNED IN</span>
+          <strong id="playerName">Guest</strong>
+        </div>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <div class="action-row">
+        <p class="message" id="appMessage" role="status"></p>
+        <button class="ghost compact" id="logoutButton" type="button">Log Out</button>
+      </div>
+
+        <section class="panel add-panel">
+          <div class="section-title">
+            <span class="pixel-icon" aria-hidden="true"></span>
+            <h2>Add Game</h2>
+          </div>
+          <form class="game-form" id="gameForm">
+            <label>
+              Title
+              <input name="title" placeholder="Chrono Trigger" required>
+            </label>
+            <label>
+              Platform
+              <input name="platform" placeholder="SNES">
+            </label>
+            <label>
+              Genre
+              <input name="genre" placeholder="RPG">
+            </label>
+            <label>
+              Year
+              <input name="release_year" type="number" min="1970" max="2100" placeholder="1995">
+            </label>
+            <label>
+              Status
+              <select name="status">
+                <option value="playing">Playing</option>
+                <option value="completed">Completed</option>
+                <option value="dropped">Dropped</option>
+              </select>
+            </label>
+            <button class="primary" type="submit">Add To Library</button>
+          </form>
+        </section>
+
+        <section class="library-header">
+          <div>
+            <p class="eyebrow">SAVE FILES</p>
+            <h2>Your Library</h2>
+          </div>
+          <div class="stats" id="stats">
+            <span>0 Playing</span>
+            <span>0 Completed</span>
+            <span>0 Dropped</span>
+          </div>
+        </section>
+
+        <section class="library-grid" id="libraryGrid" aria-live="polite">
+          <article class="empty-state">
+            <div class="mini-console" aria-hidden="true"></div>
+            <h3>No games loaded</h3>
+            <p>Log in and add your first game to begin tracking your backlog.</p>
+          </article>
+        </section>
+    </section>
+  </main>
+
+  <div class="modal-backdrop hidden" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+    <section class="modal-panel">
+      <div class="modal-art" aria-hidden="true"></div>
+      <p class="eyebrow">DELETE SAVE SLOT</p>
+      <h2 id="deleteModalTitle">Remove this game?</h2>
+      <p class="modal-copy">
+        <strong id="deleteGameTitle">Selected game</strong> will be removed from your library.
+      </p>
+      <div class="modal-actions">
+        <button class="ghost compact" id="cancelDeleteButton" type="button">Keep Game</button>
+        <button class="danger-button" id="confirmDeleteButton" type="button">Delete</button>
+      </div>
+    </section>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
